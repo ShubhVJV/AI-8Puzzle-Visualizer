@@ -6,6 +6,10 @@
  * Assigned Algorithm: Depth First Search (DFS)
  */
 
+if (typeof require !== 'undefined') {
+  var { PuzzleUtils } = require('./puzzle.js');
+}
+
 class PuzzleVisualizer {
   constructor() {
     this.currentBoard = [...PuzzleUtils.DEFAULT_GOAL];
@@ -37,7 +41,15 @@ class PuzzleVisualizer {
     this.currentResult = result;
     this.mode = mode;
 
-    if (mode === 'solution' && result && result.path && result.path.length > 0) {
+    const hasPath = result && result.path && result.path.length > 1;
+    const hasSearchSteps = result && result.steps && result.steps.length > 1;
+
+    // If requested solution but no solution path found, automatically fallback to search exploration steps
+    if (mode === 'solution' && !hasPath && hasSearchSteps) {
+      this.mode = 'search';
+    }
+
+    if (this.mode === 'solution' && hasPath) {
       // Solution path frames
       this.steps = result.path.map((state, idx) => ({
         type: 'solution',
@@ -51,14 +63,14 @@ class PuzzleVisualizer {
         f: state.f,
         node: state
       }));
-    } else if (mode === 'search' && result && result.steps && result.steps.length > 0) {
+    } else if (hasSearchSteps) {
       // Step-by-step search process frames
       this.steps = result.steps.map((st, idx) => ({
         type: 'search',
         stepIndex: idx,
-        totalSteps: result.steps.length,
+        totalSteps: result.steps.length - 1,
         board: st.currentNode.board,
-        action: st.action || 'Start',
+        action: st.action || 'Expand Node',
         depth: st.currentDepth,
         cost: st.gVal,
         h: st.hVal,
@@ -90,13 +102,18 @@ class PuzzleVisualizer {
   }
 
   play() {
-    if (this.isPlaying || this.steps.length <= 1) return;
+    if (this.steps.length <= 1) {
+      if (this.onPlayStateChange) this.onPlayStateChange(false, 'empty');
+      return;
+    }
+
     if (this.currentIndex >= this.steps.length - 1) {
       this.currentIndex = 0; // Loop or restart from beginning
+      this.applyCurrentStep();
     }
 
     this.isPlaying = true;
-    if (this.onPlayStateChange) this.onPlayStateChange(true);
+    if (this.onPlayStateChange) this.onPlayStateChange(true, 'playing');
     this.tick();
   }
 
@@ -106,7 +123,7 @@ class PuzzleVisualizer {
       clearTimeout(this.timer);
       this.timer = null;
     }
-    if (this.onPlayStateChange) this.onPlayStateChange(false);
+    if (this.onPlayStateChange) this.onPlayStateChange(false, 'paused');
   }
 
   resume() {
@@ -129,7 +146,9 @@ class PuzzleVisualizer {
     if (this.currentIndex < this.steps.length - 1) {
       this.currentIndex++;
       this.applyCurrentStep();
+      return true;
     }
+    return false;
   }
 
   prevStep() {
@@ -137,7 +156,9 @@ class PuzzleVisualizer {
     if (this.currentIndex > 0) {
       this.currentIndex--;
       this.applyCurrentStep();
+      return true;
     }
+    return false;
   }
 
   goToStep(index) {
@@ -159,7 +180,12 @@ class PuzzleVisualizer {
       this.applyCurrentStep();
       this.timer = setTimeout(() => this.tick(), this.speed);
     } else {
-      this.pause();
+      this.isPlaying = false;
+      if (this.timer) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+      if (this.onPlayStateChange) this.onPlayStateChange(false, 'ended');
     }
   }
 

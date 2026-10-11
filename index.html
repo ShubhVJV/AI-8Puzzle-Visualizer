@@ -158,10 +158,10 @@
             <div id="dfsDepthGroup" class="space-y-1.5 pt-2 border-t border-slate-700/40">
               <div class="flex justify-between text-xs">
                 <span class="text-slate-400">DFS Max Depth Guard:</span>
-                <span class="text-pink-400 font-mono font-bold">25</span>
+                <span id="dfsDepthLabel" class="text-pink-400 font-mono font-bold">16</span>
               </div>
-              <input type="number" id="dfsMaxDepth" value="25" min="5" max="100" class="w-full bg-slate-900 border border-slate-700 rounded text-xs px-2 py-1 text-slate-200">
-              <p class="text-[10px] text-slate-500 leading-tight">Prevents stack overflow in deep branches for DFS.</p>
+              <input type="number" id="dfsMaxDepth" value="16" min="5" max="100" class="w-full bg-slate-900 border border-slate-700 rounded text-xs px-2 py-1 text-slate-200">
+              <p class="text-[10px] text-slate-500 leading-tight">Default 16 solves 5-10 move puzzles in ~400 expansions like the assignment table.</p>
             </div>
 
             <!-- DLS Depth Input -->
@@ -234,7 +234,7 @@
           <!-- Board Card -->
           <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6 w-full flex flex-col items-center shadow-xl">
             <!-- Step banner -->
-            <div class="w-full flex items-center justify-between mb-4">
+            <div class="w-full flex items-center justify-between mb-2">
               <div class="flex items-center gap-2">
                 <span id="currentStepLabel" class="text-sm font-semibold text-slate-200">Step 0 / 0</span>
               </div>
@@ -242,6 +242,11 @@
                 <span class="text-xs text-slate-400">Move:</span>
                 <span id="currentActionBadge" class="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-pink-500/20 text-pink-400 border border-pink-500/30">Initial</span>
               </div>
+            </div>
+
+            <!-- Dynamic Playback Status Banner -->
+            <div id="playbackBanner" class="w-full text-center text-xs py-1.5 px-3 rounded-xl bg-slate-900/70 border border-slate-700/50 text-slate-300 mb-2 font-medium transition-all">
+              Ready: Click "▶ Run Search" to solve puzzle
             </div>
 
             <!-- 3x3 Main Puzzle Board -->
@@ -277,6 +282,10 @@
 
               <button id="btnResume" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm rounded-xl transition flex items-center gap-2 hidden">
                 ▶ Resume
+              </button>
+
+              <button id="btnReplay" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm rounded-xl transition flex items-center gap-2 hidden">
+                🔁 Replay
               </button>
 
               <button id="btnNext" title="Next Step" class="p-2.5 bg-slate-700/60 hover:bg-slate-700 rounded-xl text-slate-300 hover:text-white transition">

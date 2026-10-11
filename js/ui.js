@@ -45,9 +45,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnRun = document.getElementById('btnRun');
   const btnPause = document.getElementById('btnPause');
   const btnResume = document.getElementById('btnResume');
+  const btnReplay = document.getElementById('btnReplay');
   const btnNext = document.getElementById('btnNext');
   const btnPrev = document.getElementById('btnPrev');
   const btnReset = document.getElementById('btnReset');
+  const playbackBanner = document.getElementById('playbackBanner');
+  const dfsDepthLabel = document.getElementById('dfsDepthLabel');
+  const dfsMaxDepthInput = document.getElementById('dfsMaxDepth');
   const speedSlider = document.getElementById('speedSlider');
   const speedLabel = document.getElementById('speedLabel');
   const viewModeRadios = document.querySelectorAll('input[name="viewMode"]');
@@ -62,17 +66,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const solvabilityBadge = document.getElementById('solvabilityBadge');
 
   // Render board helper
+  let previousBoardState = null;
+
   function renderBoard(element, board, isInteractive = false, isDfsTheme = false) {
     if (!element) return;
-    element.innerHTML = '';
-    board.forEach((val, index) => {
-      const tile = document.createElement('div');
-      tile.className = `puzzle-tile ${val === 0 ? 'tile-blank' : 'tile-active'} ${isDfsTheme && val !== 0 ? 'tile-dfs' : ''}`;
-      tile.dataset.value = val;
-      tile.dataset.index = index;
-      tile.textContent = val === 0 ? '' : val;
-      element.appendChild(tile);
-    });
+
+    let movedVal = null;
+    if (previousBoardState && previousBoardState.length === 9) {
+      const prevZero = previousBoardState.indexOf(0);
+      const newZero = board.indexOf(0);
+      if (prevZero !== -1 && newZero !== -1 && prevZero !== newZero) {
+        movedVal = board[prevZero];
+      }
+    }
+    previousBoardState = [...board];
+
+    if (element.children.length === 9) {
+      // In-place DOM update for smooth animation
+      Array.from(element.children).forEach((tile, index) => {
+        const val = board[index];
+        tile.dataset.value = val;
+        tile.dataset.index = index;
+        tile.textContent = val === 0 ? '' : val;
+        let cls = `puzzle-tile ${val === 0 ? 'tile-blank' : 'tile-active'} ${isDfsTheme && val !== 0 ? 'tile-dfs' : ''}`;
+        if (val !== 0 && val === movedVal) {
+          cls += ' tile-highlight-move';
+        }
+        tile.className = cls;
+      });
+    } else {
+      element.innerHTML = '';
+      board.forEach((val, index) => {
+        const tile = document.createElement('div');
+        tile.className = `puzzle-tile ${val === 0 ? 'tile-blank' : 'tile-active'} ${isDfsTheme && val !== 0 ? 'tile-dfs' : ''}`;
+        tile.dataset.value = val;
+        tile.dataset.index = index;
+        tile.textContent = val === 0 ? '' : val;
+        element.appendChild(tile);
+      });
+    }
   }
 
   function renderMiniBoard(element, board) {
@@ -192,14 +224,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  visualizer.onPlayStateChange = (playing) => {
+  visualizer.onPlayStateChange = (playing, reason) => {
     if (playing) {
       btnRun.classList.add('hidden');
       btnResume.classList.add('hidden');
+      btnReplay.classList.add('hidden');
       btnPause.classList.remove('hidden');
     } else {
       btnPause.classList.add('hidden');
-      btnResume.classList.remove('hidden');
+      if (reason === 'ended') {
+        btnReplay.classList.remove('hidden');
+        btnResume.classList.add('hidden');
+        btnRun.classList.add('hidden');
+        if (playbackBanner) {
+          playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 mb-2 font-bold shadow-lg shadow-emerald-500/10';
+          playbackBanner.innerHTML = '🎯 Goal State Reached! Completed in ' + (visualizer.steps.length - 1) + ' moves.';
+        }
+      } else if (reason === 'paused') {
+        btnResume.classList.remove('hidden');
+        btnReplay.classList.add('hidden');
+        btnRun.classList.add('hidden');
+      } else {
+        btnResume.classList.add('hidden');
+        btnReplay.classList.add('hidden');
+        btnRun.classList.remove('hidden');
+      }
     }
   };
 
@@ -211,17 +260,32 @@ document.addEventListener('DOMContentLoaded', () => {
     dfsDepthGroup.classList.toggle('hidden', val !== 'DFS');
   });
 
+  if (dfsMaxDepthInput && dfsDepthLabel) {
+    dfsMaxDepthInput.addEventListener('input', (e) => {
+      dfsDepthLabel.textContent = e.target.value;
+    });
+  }
+
   // Execute Search
-  function runSearch() {
+  function runSearch(autoPlay = true) {
     const alg = algorithmSelect.value;
     const heur = document.querySelector('input[name="heuristic"]:checked')?.value || 'manhattan';
     const dlsLimit = parseInt(document.getElementById('dlsDepthLimit')?.value || '12', 10);
-    const dfsMaxDepth = parseInt(document.getElementById('dfsMaxDepth')?.value || '25', 10);
+    const dfsMaxDepth = parseInt(document.getElementById('dfsMaxDepth')?.value || '16', 10);
 
     const isSolv = PuzzleUtils.isSolvable(initialBoard, goalBoard);
     if (!isSolv) {
+      if (playbackBanner) {
+        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-rose-950/60 border border-rose-500/60 text-rose-300 mb-2 font-semibold';
+        playbackBanner.textContent = '❌ Warning: This puzzle is mathematically unsolvable due to inversion parity mismatch!';
+      }
       alert('Warning: This initial state is mathematically unsolvable for the selected goal state! Inversion parities do not match.');
       return;
+    }
+
+    if (playbackBanner) {
+      playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 mb-2 font-medium';
+      playbackBanner.innerHTML = '⚙️ Running ' + alg + ' search...';
     }
 
     const params = {
@@ -229,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       depthLimit: dlsLimit,
       maxLimit: 22,
       maxDepth: dfsMaxDepth,
+      maxExpandedLimit: 75000,
       recordSteps: true
     };
 
@@ -246,16 +311,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const selectedMode = document.querySelector('input[name="viewMode"]:checked')?.value || 'solution';
     visualizer.loadSearchResult(result, selectedMode);
-    visualizer.play();
+
+    if (result.found) {
+      if (playbackBanner) {
+        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 mb-2 font-semibold';
+        playbackBanner.innerHTML = '✨ ' + alg + ' found solution in ' + result.moves + ' moves (' + result.nodesExpanded.toLocaleString() + ' nodes expanded, ' + result.executionTimeMs + ' ms)!';
+      }
+    } else {
+      if (playbackBanner) {
+        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-300 mb-2 font-semibold';
+        playbackBanner.innerHTML = '⚠️ Cutoff reached at depth ' + dfsMaxDepth + '. Visualizing ' + result.steps.length + ' explored search steps.';
+      }
+      const searchRadio = document.querySelector('input[name="viewMode"][value="search"]');
+      if (searchRadio) searchRadio.checked = true;
+    }
+
+    if (autoPlay) {
+      visualizer.play();
+    }
   }
 
   // Playback Buttons
-  btnRun.addEventListener('click', runSearch);
+  btnRun.addEventListener('click', () => runSearch(true));
   btnPause.addEventListener('click', () => visualizer.pause());
   btnResume.addEventListener('click', () => visualizer.resume());
-  btnNext.addEventListener('click', () => visualizer.nextStep());
-  btnPrev.addEventListener('click', () => visualizer.prevStep());
-  btnReset.addEventListener('click', () => visualizer.reset());
+  btnReplay.addEventListener('click', () => visualizer.play());
+  
+  btnNext.addEventListener('click', () => {
+    if (!lastSearchResult || visualizer.steps.length <= 1) {
+      runSearch(false);
+      visualizer.nextStep();
+    } else {
+      visualizer.nextStep();
+    }
+  });
+
+  btnPrev.addEventListener('click', () => {
+    visualizer.prevStep();
+  });
+
+  btnReset.addEventListener('click', () => {
+    visualizer.reset();
+    resetStats();
+  });
 
   timelineSlider.addEventListener('input', (e) => {
     visualizer.goToStep(parseInt(e.target.value, 10));
@@ -263,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   speedSlider.addEventListener('input', (e) => {
     const val = parseInt(e.target.value, 10);
-    // Invert so higher slider value = faster animation
+    // Invert so higher slider value = faster animation (50ms to 1000ms)
     const ms = 1050 - val;
     visualizer.setSpeed(ms);
     speedLabel.textContent = `${val > 800 ? 'Fast' : val > 400 ? 'Normal' : 'Slow'} (${ms}ms)`;
@@ -273,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
       if (lastSearchResult) {
         visualizer.loadSearchResult(lastSearchResult, radio.value);
+        visualizer.play();
       }
     });
   });
@@ -330,11 +429,16 @@ document.addEventListener('DOMContentLoaded', () => {
     statHeuristicH.textContent = 'N/A';
     statEvaluationF.textContent = 'N/A';
     if (currentStepLabel) currentStepLabel.textContent = 'Step 0 / 0';
-    if (currentActionBadge) currentActionBadge.textContent = 'None';
+    if (currentActionBadge) currentActionBadge.textContent = 'Initial';
     if (frontierStackContainer) frontierStackContainer.innerHTML = '<span class="text-xs text-slate-500 italic p-2">Ready to run search</span>';
+    if (playbackBanner) {
+      playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-slate-900/70 border border-slate-700/50 text-slate-300 mb-2 font-medium';
+      playbackBanner.textContent = 'Ready: Click "▶ Run Search" to solve puzzle';
+    }
     btnRun.classList.remove('hidden');
     btnPause.classList.add('hidden');
     btnResume.classList.add('hidden');
+    btnReplay.classList.add('hidden');
   }
 
   // Custom Input Modal
@@ -393,7 +497,7 @@ document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         const algorithms = [
           { name: 'Breadth First Search (BFS)', key: 'BFS', params: {} },
-          { name: 'Depth First Search (DFS)', key: 'DFS', params: { maxDepth: 25 }, isAssigned: true },
+          { name: 'Depth First Search (DFS)', key: 'DFS', params: { maxDepth: 16 }, isAssigned: true },
           { name: 'Depth Limited Search (DLS)', key: 'DLS', params: { depthLimit: 12 } },
           { name: 'Iterative Deepening (IDDLS)', key: 'IDDLS', params: { maxLimit: 18 } },
           { name: 'Greedy Best First (GBFS - Manhattan)', key: 'GBFS', params: { heuristic: 'manhattan' } },

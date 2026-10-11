@@ -77,8 +77,8 @@ class SearchAlgorithms {
    * Includes a safety maxDepth limit (default: 50) and step limit to protect browser memory.
    */
   static solveDFS(initialBoard, goalBoard, options = {}) {
-    const maxDepth = options.maxDepth || 50;
-    const maxExpandedLimit = options.maxExpandedLimit || 15000;
+    const maxDepth = options.maxDepth !== undefined ? options.maxDepth : 16;
+    const maxExpandedLimit = options.maxExpandedLimit || 75000;
     const recordSteps = options.recordSteps !== false;
     const maxStepsToRecord = options.maxStepsToRecord || 1500;
 
