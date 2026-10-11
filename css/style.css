@@ -213,7 +213,7 @@ body {
   box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.45);
 }
 
-/* Interactive Slider Grid in Modal */
+/* Interactive Tile Swapper Grid in Modal */
 .custom-slider-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -237,6 +237,7 @@ body {
   font-weight: 800;
   border-radius: 10px;
   user-select: none;
+  cursor: pointer;
   transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
   position: relative;
 }
@@ -248,46 +249,37 @@ body {
   box-shadow: 
     0 4px 10px -2px rgba(0, 0, 0, 0.4),
     inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  cursor: pointer;
 }
 
-.custom-slider-tile.tile-slideable {
-  border-color: rgba(56, 189, 248, 0.6);
-  box-shadow: 
-    0 4px 12px -2px rgba(56, 189, 248, 0.25),
-    inset 0 1px 1px rgba(255, 255, 255, 0.15);
-  cursor: pointer;
-}
-
-.custom-slider-tile.tile-slideable:hover {
-  transform: translateY(-2px) scale(1.04);
+.custom-slider-tile.tile-active:hover {
+  transform: translateY(-2px) scale(1.03);
   border-color: #38bdf8;
   background: linear-gradient(145deg, #25334d 0%, #131c33 100%);
 }
 
 .custom-slider-tile.tile-selected {
   border: 2px solid #a855f7 !important;
-  box-shadow: 0 0 14px rgba(168, 85, 247, 0.5) !important;
-  transform: scale(1.05);
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.6) !important;
+  transform: scale(1.06);
+  background: linear-gradient(145deg, #2e1065 0%, #1e1b4b 100%) !important;
 }
 
 .custom-slider-tile.tile-blank {
   background: rgba(11, 17, 30, 0.5);
-  border: 2px dashed rgba(71, 85, 105, 0.35);
+  border: 2px dashed rgba(71, 85, 105, 0.4);
   color: transparent;
-  cursor: default;
 }
 
-.puzzle-tile.tile-interactive-slideable {
-  cursor: pointer;
+.custom-slider-tile.tile-blank:hover {
+  border-color: rgba(148, 163, 184, 0.6);
+  background: rgba(18, 26, 44, 0.5);
+  transform: translateY(-2px) scale(1.03);
 }
 
-.puzzle-tile.tile-interactive-slideable:hover {
-  transform: translateY(-3px) scale(1.02);
-  border-color: #38bdf8;
-  box-shadow: 
-    0 8px 20px -2px rgba(56, 189, 248, 0.3),
-    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+.custom-slider-tile.tile-blank.tile-selected {
+  border: 2px dashed #a855f7 !important;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.6) !important;
+  background: rgba(88, 28, 135, 0.25) !important;
 }
 
 /* Comparison bar */
