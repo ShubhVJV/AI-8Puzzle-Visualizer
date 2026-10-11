@@ -68,6 +68,12 @@ function initApp() {
   // Render board helper
   let previousBoardState = null;
 
+  function areTilesAdjacent(idx1, idx2) {
+    const r1 = Math.floor(idx1 / 3), c1 = idx1 % 3;
+    const r2 = Math.floor(idx2 / 3), c2 = idx2 % 3;
+    return (Math.abs(r1 - r2) + Math.abs(c1 - c2)) === 1;
+  }
+
   function renderBoard(element, board, isInteractive = false, isDfsTheme = false) {
     if (!element) return;
 
@@ -80,6 +86,8 @@ function initApp() {
       }
     }
     previousBoardState = [...board];
+    const blankIdx = board.indexOf(0);
+    const canSlideMain = (element === mainBoardEl && !visualizer.isPlaying && visualizer.currentStepIndex === 0);
 
     if (element.children.length === 9) {
       // In-place DOM update for smooth animation
@@ -92,19 +100,53 @@ function initApp() {
         if (val !== 0 && val === movedVal) {
           cls += ' tile-highlight-move';
         }
+        if (canSlideMain && val !== 0 && areTilesAdjacent(index, blankIdx)) {
+          cls += ' tile-interactive-slideable';
+          tile.title = 'Click to slide into empty slot';
+        } else {
+          tile.removeAttribute('title');
+        }
         tile.className = cls;
       });
     } else {
       element.innerHTML = '';
       board.forEach((val, index) => {
         const tile = document.createElement('div');
-        tile.className = `puzzle-tile ${val === 0 ? 'tile-blank' : 'tile-active'} ${isDfsTheme && val !== 0 ? 'tile-dfs' : ''}`;
+        let cls = `puzzle-tile ${val === 0 ? 'tile-blank' : 'tile-active'} ${isDfsTheme && val !== 0 ? 'tile-dfs' : ''}`;
+        if (canSlideMain && val !== 0 && areTilesAdjacent(index, blankIdx)) {
+          cls += ' tile-interactive-slideable';
+          tile.title = 'Click to slide into empty slot';
+        }
+        tile.className = cls;
         tile.dataset.value = val;
         tile.dataset.index = index;
         tile.textContent = val === 0 ? '' : val;
         element.appendChild(tile);
       });
     }
+  }
+
+  // Interactive sliding on main board when ready
+  if (mainBoardEl) {
+    mainBoardEl.addEventListener('click', (e) => {
+      if (visualizer.isPlaying || visualizer.currentStepIndex !== 0) return;
+      const tileEl = e.target.closest('.puzzle-tile');
+      if (!tileEl) return;
+      const clickedIdx = parseInt(tileEl.dataset.index, 10);
+      const blankIdx = initialBoard.indexOf(0);
+      if (!isNaN(clickedIdx) && initialBoard[clickedIdx] !== 0 && areTilesAdjacent(clickedIdx, blankIdx)) {
+        const temp = initialBoard[clickedIdx];
+        initialBoard[clickedIdx] = 0;
+        initialBoard[blankIdx] = temp;
+        visualizer.setBoards(initialBoard, goalBoard);
+        renderBoard(mainBoardEl, initialBoard, false, true);
+        renderMiniBoard(initialMiniEl, initialBoard);
+        updateSolvabilityUI();
+        updateSuccessorsPreview(initialBoard);
+        updateFrontierVisualizer([initialBoard], true);
+        resetStats();
+      }
+    });
   }
 
   function renderMiniBoard(element, board) {
@@ -441,47 +483,261 @@ function initApp() {
     btnReplay.classList.add('hidden');
   }
 
-  // Custom Input Modal
-  btnOpenCustomModal.addEventListener('click', () => {
-    // Populate modal inputs with current board
-    for (let i = 0; i < 9; i++) {
-      const initInp = document.getElementById(`customInit_${i}`);
-      const goalInp = document.getElementById(`customGoal_${i}`);
-      if (initInp) initInp.value = initialBoard[i];
-      if (goalInp) goalInp.value = goalBoard[i];
+  // ==================== INTERACTIVE CUSTOM BLOCK SLIDER CONTROLLER ====================
+  let modalInitBoard = [...initialBoard];
+  let modalGoalBoard = [...goalBoard];
+  let customInteractionMode = 'slide'; // 'slide' or 'swap'
+  let selectedSwapInit = null;
+  let selectedSwapGoal = null;
+
+  const modalInitGrid = document.getElementById('modalInitGrid');
+  const modalGoalGrid = document.getElementById('modalGoalGrid');
+  const customModeTip = document.getElementById('customModeTip');
+  const btnModeSlide = document.getElementById('btnModeSlide');
+  const btnModeSwap = document.getElementById('btnModeSwap');
+  const customInitInversions = document.getElementById('customInitInversions');
+  const customGoalInversions = document.getElementById('customGoalInversions');
+  const modalSolvabilityNotice = document.getElementById('modalSolvabilityNotice');
+  const modalSolvabilityText = document.getElementById('modalSolvabilityText');
+  const btnCancelCustomModal = document.getElementById('btnCancelCustomModal');
+
+  function renderModalBoard(container, board, isInit = true) {
+    if (!container) return;
+    container.innerHTML = '';
+    const blankIdx = board.indexOf(0);
+    const selectedIdx = isInit ? selectedSwapInit : selectedSwapGoal;
+
+    board.forEach((val, idx) => {
+      const tile = document.createElement('div');
+      const isBlank = (val === 0);
+      const isSlideable = (!isBlank && areTilesAdjacent(idx, blankIdx));
+      const isSelected = (idx === selectedIdx);
+
+      let cls = 'custom-slider-tile ';
+      if (isBlank) {
+        cls += 'tile-blank';
+        tile.title = 'Empty slot';
+      } else {
+        cls += 'tile-active';
+        if (customInteractionMode === 'slide' && isSlideable) {
+          cls += ' tile-slideable';
+          tile.title = 'Click to slide into empty slot';
+        } else if (customInteractionMode === 'swap') {
+          tile.title = 'Click to swap';
+        }
+        if (isSelected) {
+          cls += ' tile-selected';
+        }
+      }
+
+      tile.className = cls;
+      tile.textContent = isBlank ? '' : val;
+      tile.dataset.index = idx;
+      tile.dataset.value = val;
+
+      tile.addEventListener('click', () => {
+        handleModalTileClick(isInit, idx);
+      });
+
+      container.appendChild(tile);
+    });
+
+    updateModalStatus();
+  }
+
+  function handleModalTileClick(isInit, idx) {
+    const board = isInit ? modalInitBoard : modalGoalBoard;
+    const blankIdx = board.indexOf(0);
+
+    if (customInteractionMode === 'slide') {
+      // Slide mode: click adjacent block to slide into empty slot
+      if (board[idx] !== 0 && areTilesAdjacent(idx, blankIdx)) {
+        const temp = board[idx];
+        board[idx] = 0;
+        board[blankIdx] = temp;
+        renderModalBoards();
+      }
+    } else {
+      // Swap mode: select first block, then second block to swap any two positions
+      const selected = isInit ? selectedSwapInit : selectedSwapGoal;
+      if (selected === null) {
+        if (isInit) selectedSwapInit = idx;
+        else selectedSwapGoal = idx;
+        renderModalBoards();
+      } else if (selected === idx) {
+        // Deselect
+        if (isInit) selectedSwapInit = null;
+        else selectedSwapGoal = null;
+        renderModalBoards();
+      } else {
+        const temp = board[selected];
+        board[selected] = board[idx];
+        board[idx] = temp;
+        if (isInit) selectedSwapInit = null;
+        else selectedSwapGoal = null;
+        renderModalBoards();
+      }
     }
+  }
+
+  function renderModalBoards() {
+    renderModalBoard(modalInitGrid, modalInitBoard, true);
+    renderModalBoard(modalGoalGrid, modalGoalBoard, false);
+  }
+
+  function updateModalStatus() {
+    const invInit = PuzzleUtils.countInversions(modalInitBoard);
+    const invGoal = PuzzleUtils.countInversions(modalGoalBoard);
+
+    if (customInitInversions) customInitInversions.textContent = `Inversions: ${invInit}`;
+    if (customGoalInversions) customGoalInversions.textContent = `Inversions: ${invGoal}`;
+
+    const isSolv = (invInit % 2 === invGoal % 2);
+    if (modalSolvabilityNotice && modalSolvabilityText) {
+      if (isSolv) {
+        modalSolvabilityNotice.className = 'p-3 rounded-xl border flex items-center justify-between text-xs bg-emerald-500/10 border-emerald-500/20 text-emerald-300';
+        modalSolvabilityText.innerHTML = `Solvable Pair: Inversion parities match (${invInit % 2 === 0 ? 'Even' : 'Odd'}).`;
+      } else {
+        modalSolvabilityNotice.className = 'p-3 rounded-xl border flex items-center justify-between text-xs bg-rose-500/10 border-rose-500/30 text-rose-300';
+        modalSolvabilityText.innerHTML = `Parity Mismatch (${invInit} vs ${invGoal}). Slide or swap blocks to match parity.`;
+      }
+    }
+  }
+
+  // Mode toggles
+  if (btnModeSlide && btnModeSwap) {
+    btnModeSlide.addEventListener('click', () => {
+      customInteractionMode = 'slide';
+      selectedSwapInit = null;
+      selectedSwapGoal = null;
+      btnModeSlide.className = 'px-3 py-1 rounded-md bg-blue-600 text-white transition shadow-sm';
+      btnModeSwap.className = 'px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';
+      if (customModeTip) customModeTip.textContent = 'Click any block next to the empty space to slide it in.';
+      renderModalBoards();
+    });
+
+    btnModeSwap.addEventListener('click', () => {
+      customInteractionMode = 'swap';
+      selectedSwapInit = null;
+      selectedSwapGoal = null;
+      btnModeSwap.className = 'px-3 py-1 rounded-md bg-violet-600 text-white transition shadow-sm';
+      btnModeSlide.className = 'px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';
+      if (customModeTip) customModeTip.textContent = 'Click two blocks to swap their positions directly.';
+      renderModalBoards();
+    });
+  }
+
+  // Initial Scramble button:
+  const btnScrambleInit10 = document.getElementById('btnScrambleInit10');
+  if (btnScrambleInit10) {
+    btnScrambleInit10.addEventListener('click', () => {
+      let count = 0;
+      let lastMoved = -1;
+      const interval = setInterval(() => {
+        const blankIdx = modalInitBoard.indexOf(0);
+        const neighbors = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(i => areTilesAdjacent(i, blankIdx) && i !== lastMoved);
+        const pick = neighbors.length > 0 ? neighbors[Math.floor(Math.random() * neighbors.length)] : [0, 1, 2, 3, 4, 5, 6, 7, 8].find(i => areTilesAdjacent(i, blankIdx));
+        if (pick !== undefined) {
+          modalInitBoard[blankIdx] = modalInitBoard[pick];
+          modalInitBoard[pick] = 0;
+          lastMoved = blankIdx;
+        }
+        renderModalBoards();
+        count++;
+        if (count >= 10) clearInterval(interval);
+      }, 55);
+    });
+  }
+
+  // Presets in modal
+  const btnLoadAssignmentInit = document.getElementById('btnLoadAssignmentInit');
+  if (btnLoadAssignmentInit) {
+    btnLoadAssignmentInit.addEventListener('click', () => {
+      modalInitBoard = [2, 8, 3, 1, 6, 4, 7, 0, 5];
+      selectedSwapInit = null;
+      renderModalBoards();
+    });
+  }
+
+  const btnResetInitModal = document.getElementById('btnResetInitModal');
+  if (btnResetInitModal) {
+    btnResetInitModal.addEventListener('click', () => {
+      modalInitBoard = [...initialBoard];
+      selectedSwapInit = null;
+      renderModalBoards();
+    });
+  }
+
+  const btnLoadAssignmentGoal = document.getElementById('btnLoadAssignmentGoal');
+  if (btnLoadAssignmentGoal) {
+    btnLoadAssignmentGoal.addEventListener('click', () => {
+      modalGoalBoard = [1, 2, 3, 8, 0, 4, 7, 6, 5];
+      selectedSwapGoal = null;
+      renderModalBoards();
+    });
+  }
+
+  const btnLoadClassicGoal = document.getElementById('btnLoadClassicGoal');
+  if (btnLoadClassicGoal) {
+    btnLoadClassicGoal.addEventListener('click', () => {
+      modalGoalBoard = [1, 2, 3, 4, 5, 6, 7, 8, 0];
+      selectedSwapGoal = null;
+      renderModalBoards();
+    });
+  }
+
+  const btnResetGoalModal = document.getElementById('btnResetGoalModal');
+  if (btnResetGoalModal) {
+    btnResetGoalModal.addEventListener('click', () => {
+      modalGoalBoard = [...goalBoard];
+      selectedSwapGoal = null;
+      renderModalBoards();
+    });
+  }
+
+  // Modal Open & Close
+  btnOpenCustomModal.addEventListener('click', () => {
+    modalInitBoard = [...initialBoard];
+    modalGoalBoard = [...goalBoard];
+    selectedSwapInit = null;
+    selectedSwapGoal = null;
+    customInteractionMode = 'slide';
+    if (btnModeSlide) btnModeSlide.className = 'px-3 py-1 rounded-md bg-blue-600 text-white transition shadow-sm';
+    if (btnModeSwap) btnModeSwap.className = 'px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 transition';
+    if (customModeTip) customModeTip.textContent = 'Click any block next to the empty space to slide it in.';
+    renderModalBoards();
     customModal.classList.remove('hidden');
   });
 
-  btnCloseCustomModal.addEventListener('click', () => {
-    customModal.classList.add('hidden');
-  });
+  if (btnCloseCustomModal) {
+    btnCloseCustomModal.addEventListener('click', () => {
+      customModal.classList.add('hidden');
+    });
+  }
+
+  if (btnCancelCustomModal) {
+    btnCancelCustomModal.addEventListener('click', () => {
+      customModal.classList.add('hidden');
+    });
+  }
 
   btnSaveCustomBoard.addEventListener('click', () => {
-    const newInit = [];
-    const newGoal = [];
-    for (let i = 0; i < 9; i++) {
-      const valI = parseInt(document.getElementById(`customInit_${i}`).value, 10);
-      const valG = parseInt(document.getElementById(`customGoal_${i}`).value, 10);
-      newInit.push(isNaN(valI) ? 0 : valI);
-      newGoal.push(isNaN(valG) ? 0 : valG);
-    }
-
-    if (!PuzzleUtils.isValidBoard(newInit) || !PuzzleUtils.isValidBoard(newGoal)) {
-      alert('Invalid configuration! Each board must contain numbers 0 through 8 exactly once (0 represents the blank tile).');
+    if (!PuzzleUtils.isValidBoard(modalInitBoard) || !PuzzleUtils.isValidBoard(modalGoalBoard)) {
+      alert('Invalid configuration! Each board must contain numbers 0 through 8 exactly once (0 represents the blank slot).');
       return;
     }
 
-    initialBoard = newInit;
-    goalBoard = newGoal;
+    initialBoard = [...modalInitBoard];
+    goalBoard = [...modalGoalBoard];
     customModal.classList.add('hidden');
 
     visualizer.setBoards(initialBoard, goalBoard);
     renderMiniBoard(initialMiniEl, initialBoard);
     renderMiniBoard(goalMiniEl, goalBoard);
     updateSolvabilityUI();
-    renderBoard(mainBoardEl, initialBoard);
+    renderBoard(mainBoardEl, initialBoard, false, true);
     updateSuccessorsPreview(initialBoard);
+    updateFrontierVisualizer([initialBoard], true);
     resetStats();
   });
 
