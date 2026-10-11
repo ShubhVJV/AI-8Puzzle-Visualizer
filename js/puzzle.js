@@ -217,6 +217,11 @@ class PuzzleUtils {
   }
 }
 
+if (typeof window !== 'undefined') {
+  window.PuzzleState = PuzzleState;
+  window.PuzzleUtils = PuzzleUtils;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { PuzzleState, PuzzleUtils };
 }

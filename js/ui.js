@@ -6,7 +6,7 @@
  * Assigned Algorithm: Depth First Search (DFS)
  */
 
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   // Initialize Visualizer
   const visualizer = new PuzzleVisualizer();
 
@@ -586,4 +586,12 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSuccessorsPreview(initialBoard);
   updateFrontierVisualizer([initialBoard], true);
   resetStats();
-});
+}
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
+}

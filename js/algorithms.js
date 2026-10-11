@@ -14,8 +14,10 @@
  * 6. A* Search
  */
 
-if (typeof require !== 'undefined') {
-  var { PuzzleState, PuzzleUtils } = require('./puzzle.js');
+if (typeof window === 'undefined' && typeof require !== 'undefined') {
+  const _p = require('./puzzle.js');
+  global.PuzzleState = _p.PuzzleState;
+  global.PuzzleUtils = _p.PuzzleUtils;
 }
 
 class SearchResult {
@@ -641,6 +643,12 @@ class SearchAlgorithms {
         return SearchAlgorithms.solveDFS(initialBoard, goalBoard, params);
     }
   }
+}
+
+if (typeof window !== 'undefined') {
+  window.SearchAlgorithms = SearchAlgorithms;
+  window.SearchResult = SearchResult;
+  window.SearchStep = SearchStep;
 }
 
 if (typeof module !== 'undefined' && module.exports) {

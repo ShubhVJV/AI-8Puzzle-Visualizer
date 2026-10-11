@@ -6,8 +6,9 @@
  * Assigned Algorithm: Depth First Search (DFS)
  */
 
-if (typeof require !== 'undefined') {
-  var { PuzzleUtils } = require('./puzzle.js');
+if (typeof window === 'undefined' && typeof require !== 'undefined') {
+  const _p = require('./puzzle.js');
+  global.PuzzleUtils = _p.PuzzleUtils;
 }
 
 class PuzzleVisualizer {
@@ -215,6 +216,10 @@ class PuzzleVisualizer {
       });
     }
   }
+}
+
+if (typeof window !== 'undefined') {
+  window.PuzzleVisualizer = PuzzleVisualizer;
 }
 
 if (typeof module !== 'undefined' && module.exports) {
