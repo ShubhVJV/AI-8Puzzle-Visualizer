@@ -1,0 +1,227 @@
+/* 
+ * 8-Puzzle Visualizer Styling
+ * Course: Artificial Intelligence
+ * Student: Shubh Vijayvargiya (24BCT0046)
+ * Algorithm: Depth First Search (DFS)
+ */
+
+:root {
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --accent: #06b6d4;
+  --dfs-highlight: #ec4899;
+  --bg-dark: #0f172a;
+  --card-dark: #1e293b;
+  --border-dark: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #0b0f19;
+  color: #f1f5f9;
+  min-height: 100vh;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Main 3x3 Puzzle Board Grid */
+.puzzle-board-container {
+  perspective: 1000px;
+}
+
+.puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 320px;
+  height: 320px;
+  background: #1e293b;
+  padding: 12px;
+  border-radius: 18px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4), inset 0 2px 4px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid #334155;
+  margin: 0 auto;
+  position: relative;
+}
+
+.puzzle-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  border-radius: 12px;
+  user-select: none;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  cursor: default;
+  position: relative;
+}
+
+.puzzle-tile.tile-active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border: 1px solid #60a5fa;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.puzzle-tile.tile-dfs {
+  background: linear-gradient(135deg, #ec4899, #be185d);
+  border: 1px solid #f472b6;
+}
+
+.puzzle-tile.tile-blank {
+  background: rgba(15, 23, 42, 0.6);
+  border: 2px dashed #475569;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  color: transparent;
+}
+
+.puzzle-tile.tile-highlight-move {
+  animation: pulse-move 0.6s ease-in-out;
+  border-color: #38bdf8;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+}
+
+@keyframes pulse-move {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Mini puzzle boards for successors and initial/goal preview */
+.mini-puzzle-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 90px;
+  height: 90px;
+  background: #0f172a;
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.mini-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+.mini-tile.active {
+  background: #3b82f6;
+  color: white;
+}
+
+.mini-tile.blank {
+  background: #1e293b;
+  color: transparent;
+}
+
+/* Frontier Stack / Queue visualizer */
+.frontier-visualizer {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 4px;
+  align-items: center;
+}
+
+.stack-card {
+  flex-shrink: 0;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 6px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stack-card:hover {
+  transform: translateY(-2px);
+  border-color: #60a5fa;
+}
+
+.stack-card.top-item {
+  border: 2px solid #ec4899;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+}
+
+/* Badges */
+.badge-dfs {
+  background: linear-gradient(135deg, #ec4899, #be185d);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Interactive Input Grid in Modal/Setup */
+.input-grid-cell {
+  width: 52px;
+  height: 52px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #f8fafc;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.input-grid-cell:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #0f172a;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+}
+
+/* Code & LaTeX presentation */
+.math-card {
+  background: rgba(15, 23, 42, 0.7);
+  border-left: 4px solid #6366f1;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-family: monospace;
+}
+
+/* Comparison bar */
+.bar-track {
+  background: #1e293b;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
