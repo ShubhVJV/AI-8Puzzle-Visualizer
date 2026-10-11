@@ -1,146 +1,170 @@
 /* 
- * 8-Puzzle Visualizer Styling
- * Course: Artificial Intelligence
- * Student: Shubh Vijayvargiya (24BCT0046)
- * Algorithm: Depth First Search (DFS)
+ * 8-Puzzle AI Solver & Visualizer - Enterprise Dark Theme
+ * Course: Artificial Intelligence | Student: Shubh Vijayvargiya (24BCT0046)
+ * Core Algorithm Focus: Depth First Search (DFS)
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
 :root {
-  --primary: #4f46e5;
-  --primary-hover: #4338ca;
-  --accent: #06b6d4;
-  --dfs-highlight: #ec4899;
-  --bg-dark: #0f172a;
-  --card-dark: #1e293b;
-  --border-dark: #334155;
-  --text-main: #f8fafc;
+  --bg-main: #080c15;
+  --bg-surface: #0f172a;
+  --bg-card: rgba(15, 23, 42, 0.75);
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --border-hover: rgba(148, 163, 184, 0.25);
+  --accent-primary: #3b82f6;
+  --accent-dfs: #8b5cf6;
+  --text-primary: #f8fafc;
   --text-muted: #94a3b8;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #0b0f19;
-  color: #f1f5f9;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-main);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.05) 0px, transparent 50%),
+    radial-gradient(#1e293b 0.75px, transparent 0.75px);
+  background-size: 100% 100%, 100% 100%, 24px 24px;
+  color: var(--text-primary);
   min-height: 100vh;
 }
 
-/* Custom scrollbars */
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: #090d16;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #1e293b;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #334155;
 }
 
 /* Main 3x3 Puzzle Board Grid */
-.puzzle-board-container {
-  perspective: 1000px;
+.puzzle-board-wrapper {
+  perspective: 1200px;
 }
 
 .puzzle-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  width: 320px;
-  height: 320px;
-  background: #1e293b;
-  padding: 12px;
-  border-radius: 18px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4), inset 0 2px 4px 0 rgba(255, 255, 255, 0.05);
-  border: 1px solid #334155;
+  gap: 12px;
+  width: 360px;
+  height: 360px;
+  background: #0d1322;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 
+    0 25px 40px -15px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.08);
   margin: 0 auto;
   position: relative;
+}
+
+@media (min-width: 1440px) {
+  .puzzle-grid {
+    width: 380px;
+    height: 380px;
+    gap: 14px;
+    padding: 18px;
+  }
 }
 
 .puzzle-tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
-  font-weight: 700;
-  border-radius: 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 2.25rem;
+  font-weight: 800;
+  border-radius: 14px;
   user-select: none;
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
   cursor: default;
   position: relative;
 }
 
 .puzzle-tile.tile-active {
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color: #ffffff;
-  border: 1px solid #60a5fa;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  color: #f1f5f9;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 
+    0 8px 16px -2px rgba(0, 0, 0, 0.4),
+    0 2px 4px -1px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12);
 }
 
 .puzzle-tile.tile-dfs {
-  background: linear-gradient(135deg, #ec4899, #be185d);
-  border: 1px solid #f472b6;
+  border-color: rgba(168, 85, 247, 0.35);
+  background: linear-gradient(145deg, #1e2238 0%, #111425 100%);
 }
 
 .puzzle-tile.tile-blank {
-  background: rgba(15, 23, 42, 0.6);
-  border: 2px dashed #475569;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  background: rgba(11, 17, 30, 0.6);
+  border: 2px dashed rgba(71, 85, 105, 0.4);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
   color: transparent;
 }
 
 .puzzle-tile.tile-highlight-move {
-  animation: pulse-move 0.6s ease-in-out;
+  animation: tile-step-anim 0.45s ease-out;
   border-color: #38bdf8;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+  box-shadow: 
+    0 0 20px rgba(56, 189, 248, 0.35),
+    inset 0 0 10px rgba(56, 189, 248, 0.2);
 }
 
-@keyframes pulse-move {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.06); }
+@keyframes tile-step-anim {
+  0% { transform: scale(0.96); }
+  50% { transform: scale(1.05); }
   100% { transform: scale(1); }
 }
 
-/* Mini puzzle boards for successors and initial/goal preview */
+/* Mini puzzle grids */
 .mini-puzzle-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  width: 90px;
-  height: 90px;
-  background: #0f172a;
-  padding: 5px;
+  gap: 3px;
+  width: 80px;
+  height: 80px;
+  background: #090d16;
+  padding: 4px;
   border-radius: 8px;
-  border: 1px solid #334155;
+  border: 1px solid rgba(148, 163, 184, 0.15);
 }
 
 .mini-tile {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .mini-tile.active {
-  background: #3b82f6;
-  color: white;
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 .mini-tile.blank {
-  background: #1e293b;
+  background: #090d16;
   color: transparent;
 }
 
 /* Frontier Stack / Queue visualizer */
 .frontier-visualizer {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   padding: 10px 4px;
   align-items: center;
@@ -148,80 +172,91 @@ body {
 
 .stack-card {
   flex-shrink: 0;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  padding: 6px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  padding: 8px;
   text-align: center;
-  transition: transform 0.2s;
+  transition: transform 0.2s, border-color 0.2s;
 }
 
 .stack-card:hover {
   transform: translateY(-2px);
-  border-color: #60a5fa;
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 .stack-card.top-item {
-  border: 2px solid #ec4899;
-  box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+  border: 2px solid #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
-/* Badges */
-.badge-dfs {
-  background: linear-gradient(135deg, #ec4899, #be185d);
-  color: white;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+/* Subtle Glassmorphism Card Style */
+.glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
 }
 
-/* Interactive Input Grid in Modal/Setup */
+.glass-card-interactive {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.glass-card-interactive:hover {
+  border-color: rgba(148, 163, 184, 0.25);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.45);
+}
+
+/* Interactive Input Grid in Modal */
 .input-grid-cell {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   text-align: center;
   font-size: 1.4rem;
-  font-weight: bold;
-  background: #1e293b;
-  border: 1px solid #475569;
-  border-radius: 8px;
+  font-weight: 700;
+  background: #0d1322;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
   color: #f8fafc;
-  transition: border-color 0.2s, background 0.2s;
+  font-family: 'JetBrains Mono', monospace;
+  transition: all 0.2s;
 }
 
 .input-grid-cell:focus {
   outline: none;
-  border-color: #6366f1;
-  background: #0f172a;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
-}
-
-/* Code & LaTeX presentation */
-.math-card {
-  background: rgba(15, 23, 42, 0.7);
-  border-left: 4px solid #6366f1;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  font-family: monospace;
+  border-color: #3b82f6;
+  background: #111a30;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
 }
 
 /* Comparison bar */
 .bar-track {
   background: #1e293b;
-  height: 12px;
-  border-radius: 6px;
+  height: 8px;
+  border-radius: 4px;
   overflow: hidden;
   position: relative;
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Code & LaTeX presentation */
+.math-block {
+  background: #090e1a;
+  border-left: 3px solid #3b82f6;
+  border-radius: 8px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #e2e8f0;
 }

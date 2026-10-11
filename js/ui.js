@@ -174,8 +174,8 @@ function initApp() {
       card.className = `stack-card flex flex-col items-center gap-1 ${isTop ? 'top-item' : ''}`;
 
       const badge = document.createElement('span');
-      badge.className = `text-[10px] font-mono px-1 rounded ${isTop ? 'bg-pink-500 text-white font-bold' : 'bg-slate-800 text-slate-400'}`;
-      badge.textContent = isStack ? (isTop ? 'TOP (LIFO)' : `#${idx + 1}`) : (isTop ? 'FRONT' : `#${idx + 1}`);
+      badge.className = `text-[10px] font-mono px-1.5 py-0.5 rounded ${isTop ? (isStack ? 'bg-violet-600 text-white font-bold' : 'bg-blue-600 text-white font-bold') : 'bg-slate-800 text-slate-400'}`;
+      badge.textContent = isStack ? (isTop ? 'TOP [LIFO]' : `#${idx + 1}`) : (isTop ? 'FRONT' : `#${idx + 1}`);
 
       const miniGrid = document.createElement('div');
       miniGrid.className = 'mini-puzzle-grid';
@@ -237,8 +237,8 @@ function initApp() {
         btnResume.classList.add('hidden');
         btnRun.classList.add('hidden');
         if (playbackBanner) {
-          playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-emerald-950/60 border border-emerald-500/60 text-emerald-300 mb-2 font-bold shadow-lg shadow-emerald-500/10';
-          playbackBanner.innerHTML = '🎯 Goal State Reached! Completed in ' + (visualizer.steps.length - 1) + ' moves.';
+          playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 mb-6 font-semibold shadow-inner';
+          playbackBanner.innerHTML = 'Goal State Reached &mdash; Solved in ' + (visualizer.steps.length - 1) + ' moves.';
         }
       } else if (reason === 'paused') {
         btnResume.classList.remove('hidden');
@@ -276,16 +276,16 @@ function initApp() {
     const isSolv = PuzzleUtils.isSolvable(initialBoard, goalBoard);
     if (!isSolv) {
       if (playbackBanner) {
-        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-rose-950/60 border border-rose-500/60 text-rose-300 mb-2 font-semibold';
-        playbackBanner.textContent = '❌ Warning: This puzzle is mathematically unsolvable due to inversion parity mismatch!';
+        playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-rose-950/60 border border-rose-500/60 text-rose-300 mb-6 font-semibold shadow-inner';
+        playbackBanner.textContent = 'Warning: This configuration is mathematically unsolvable due to inversion parity mismatch.';
       }
       alert('Warning: This initial state is mathematically unsolvable for the selected goal state! Inversion parities do not match.');
       return;
     }
 
     if (playbackBanner) {
-      playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 mb-2 font-medium';
-      playbackBanner.innerHTML = '⚙️ Running ' + alg + ' search...';
+      playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-blue-950/60 border border-blue-500/40 text-blue-300 mb-6 font-medium shadow-inner';
+      playbackBanner.innerHTML = 'Executing ' + alg + ' state-space search...';
     }
 
     const params = {
@@ -314,13 +314,13 @@ function initApp() {
 
     if (result.found) {
       if (playbackBanner) {
-        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 mb-2 font-semibold';
-        playbackBanner.innerHTML = '✨ ' + alg + ' found solution in ' + result.moves + ' moves (' + result.nodesExpanded.toLocaleString() + ' nodes expanded, ' + result.executionTimeMs + ' ms)!';
+        playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-300 mb-6 font-semibold shadow-inner';
+        playbackBanner.innerHTML = alg + ' solved puzzle in ' + result.moves + ' moves (' + result.nodesExpanded.toLocaleString() + ' nodes expanded in ' + result.executionTimeMs + ' ms).';
       }
     } else {
       if (playbackBanner) {
-        playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-300 mb-2 font-semibold';
-        playbackBanner.innerHTML = '⚠️ Cutoff reached at depth ' + dfsMaxDepth + '. Visualizing ' + result.steps.length + ' explored search steps.';
+        playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-amber-950/60 border border-amber-500/50 text-amber-300 mb-6 font-semibold shadow-inner';
+        playbackBanner.innerHTML = 'Cutoff reached at depth ' + dfsMaxDepth + '. Visualizing ' + result.steps.length + ' explored search steps.';
       }
       const searchRadio = document.querySelector('input[name="viewMode"][value="search"]');
       if (searchRadio) searchRadio.checked = true;
@@ -432,8 +432,8 @@ function initApp() {
     if (currentActionBadge) currentActionBadge.textContent = 'Initial';
     if (frontierStackContainer) frontierStackContainer.innerHTML = '<span class="text-xs text-slate-500 italic p-2">Ready to run search</span>';
     if (playbackBanner) {
-      playbackBanner.className = 'w-full text-center text-xs py-1.5 px-3 rounded-xl bg-slate-900/70 border border-slate-700/50 text-slate-300 mb-2 font-medium';
-      playbackBanner.textContent = 'Ready: Click "▶ Run Search" to solve puzzle';
+      playbackBanner.className = 'w-full text-center text-xs py-2 px-4 rounded-xl bg-slate-900/80 border border-slate-800 text-slate-300 mb-6 font-medium shadow-inner';
+      playbackBanner.textContent = 'Ready: Click "Run Search" to solve puzzle';
     }
     btnRun.classList.remove('hidden');
     btnPause.classList.add('hidden');
@@ -492,7 +492,7 @@ function initApp() {
   if (btnRunComparison) {
     btnRunComparison.addEventListener('click', () => {
       btnRunComparison.disabled = true;
-      btnRunComparison.innerHTML = '<span class="animate-spin inline-block mr-2">⚙</span> Benchmarking...';
+      btnRunComparison.innerHTML = '<svg class="w-4 h-4 animate-spin inline-block mr-2 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Benchmarking...';
 
       setTimeout(() => {
         const algorithms = [
@@ -553,7 +553,7 @@ function initApp() {
         });
 
         btnRunComparison.disabled = false;
-        btnRunComparison.innerHTML = '⚡ Run All Algorithms Benchmark';
+        btnRunComparison.innerHTML = '<svg class="w-4 h-4 fill-current inline-block mr-2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Run All Algorithms Benchmark';
       }, 50);
     });
   }
@@ -566,9 +566,9 @@ function initApp() {
     tab.addEventListener('click', (e) => {
       e.preventDefault();
       const targetId = tab.dataset.target;
-      navTabs.forEach(t => t.classList.remove('active', 'border-indigo-500', 'text-white'));
+      navTabs.forEach(t => t.classList.remove('active', 'border-blue-500', 'text-white'));
       navTabs.forEach(t => t.classList.add('border-transparent', 'text-slate-400'));
-      tab.classList.add('active', 'border-indigo-500', 'text-white');
+      tab.classList.add('active', 'border-blue-500', 'text-white');
       tab.classList.remove('border-transparent', 'text-slate-400');
 
       tabContents.forEach(content => {
