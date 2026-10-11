@@ -28,7 +28,7 @@ As assigned by registration number **24BCT0046**, this project features a specia
 | **Course Name** | Artificial Intelligence |
 | **Assignment Title** | Artificial Intelligence Digital Assignment (Case Study) |
 | **Assigned Algorithm** | **#2 Depth First Search (DFS)** (as listed in document assignment roster) |
-| **Marks Breakdown** | 10 Marks (Evaluated against Rubric) |
+
 
 ---
 
