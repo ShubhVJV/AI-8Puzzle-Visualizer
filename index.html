@@ -81,10 +81,6 @@
         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
         <span>DFS Theory & Case Study</span>
       </a>
-      <a href="#demo-guide" data-target="tabDemoGuide" class="nav-tab border-b-2 border-transparent text-slate-400 hover:text-slate-200 pb-3 pt-2 px-1 flex items-center gap-2 transition-colors">
-        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 10l5-3v10l-5-3v-4z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-        <span>Demonstration Video Guide</span>
-      </a>
     </nav>
   </header>
 
@@ -124,7 +120,7 @@
                 <label class="text-[11px] font-medium text-slate-400">Method 1:</label>
                 <button id="btnOpenCustomModal" class="w-full bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-semibold py-2 px-3.5 rounded-xl border border-slate-700 hover:border-slate-600 transition flex items-center justify-center gap-2">
                   <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
-                  <span>Custom Layout (Tile Swap)</span>
+                  <span>Custom Input (Swap Two Numbers)</span>
                 </button>
               </div>
 
@@ -694,74 +690,11 @@
 
     </section>
 
-    <!-- ======================================================== -->
-    <!-- TAB 4: DEMONSTRATION VIDEO GUIDE                        -->
-    <!-- ======================================================== -->
-    <section id="tabDemoGuide" class="tab-content space-y-6 hidden">
-      <div class="glass-card p-6 lg:p-8 space-y-6">
-        
-        <div class="pb-5 border-b border-slate-800">
-          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/15 text-blue-300 border border-blue-500/30 inline-block mb-2">
-            Rubric Compliance: 1 Mark for Demonstration
-          </span>
-          <h2 class="text-xl lg:text-2xl font-bold text-white tracking-tight">3–5 Minute Demonstration Video Presentation Script</h2>
-          <p class="text-xs text-slate-400 mt-1">
-            Follow this structured breakdown when recording your demonstration video for submission.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-xs font-bold text-violet-400">
-              <span>Part 1: Student Credentials & Overview</span>
-              <span class="font-mono">0:00 – 0:45</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Introduce yourself: <em>"Hello, my name is <strong>Shubh Vijayvargiya</strong>, registration number <strong>24BCT0046</strong>. This is my Artificial Intelligence Digital Assignment on solving the 8-Puzzle Problem using state-space search algorithms. My assigned algorithm is <strong>Depth First Search (DFS)</strong>."</em> Show the header credentials and clean UI layout.
-            </p>
-          </div>
-
-          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-xs font-bold text-blue-400">
-              <span>Part 2: Puzzle Modeling & Solvability</span>
-              <span class="font-mono">0:45 – 1:45</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Demonstrate <strong>Method 1 (Custom State Input Modal)</strong> and enter initial/goal boards. Explain the <strong>Inversion Parity Solvability Invariant</strong> and show how the badge validates reachable states. Click <strong>Method 2 (Generate Solvable State)</strong> to show dynamic board generation.
-            </p>
-          </div>
-
-          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-xs font-bold text-emerald-400">
-              <span>Part 3: Depth First Search Execution</span>
-              <span class="font-mono">1:45 – 3:00</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Select <strong>Depth First Search</strong>, explain the LIFO Stack frontier preview, and click <strong>Run Search</strong>. Use the interactive controls: Pause, Next Step, Previous Step, and Speed Slider. Explain why DFS traverses deep branches in the 8-puzzle and how cycle detection prevents infinite loops.
-            </p>
-          </div>
-
-          <div class="bg-slate-900/80 p-5 rounded-xl border border-slate-800 space-y-2">
-            <div class="flex justify-between items-center text-xs font-bold text-amber-400">
-              <span>Part 4: Multi-Algorithm Benchmark & Conclusion</span>
-              <span class="font-mono">3:00 – 4:15</span>
-            </div>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Switch to the <strong>6-Algorithm Benchmark</strong> tab. Click <strong>Run All Algorithms Benchmark</strong>. Compare DFS with BFS, DLS, IDDLS, GBFS, and A*. Explain the space efficiency advantage \(O(bm)\) of DFS versus exponential memory of BFS, mention the live GitHub Pages deployment, and conclude.
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
   </main>
 
   <!-- ==================== METHOD 1: CUSTOM BOARD MODAL ==================== -->
   <div id="customInputModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl overflow-y-auto max-h-[92vh]">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -770,8 +703,8 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
           </div>
           <div>
-            <h3 class="font-bold text-white text-base">Custom Board Configuration</h3>
-            <p class="text-xs text-slate-400">Interactive Tile Swapper &mdash; Click any block, then click another block to swap them</p>
+            <h3 class="font-bold text-white text-base">Method 1: Custom Input</h3>
+            <p class="text-xs text-slate-400">Swap two numbers to reconfigure the board, then change</p>
           </div>
         </div>
         <button id="btnCloseCustomModal" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition">
@@ -779,78 +712,65 @@
         </button>
       </div>
 
-      <!-- Instructions Banner (Swap Mode Only) -->
-      <div class="flex items-center justify-between gap-3 bg-slate-950/70 p-3 rounded-xl border border-slate-800/80 text-xs">
-        <div class="flex items-center gap-2.5 text-slate-300">
-          <svg class="w-4 h-4 text-violet-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span id="customModeTip">Click any block to highlight it, then click any other block (including the blank space) to swap their positions.</span>
+      <!-- Swap Two Numbers Form -->
+      <div class="bg-slate-950/70 p-4 rounded-xl border border-slate-800/80 space-y-3">
+        <span class="text-xs font-semibold text-slate-300 block">Select Two Numbers to Swap:</span>
+        <div class="grid grid-cols-5 gap-2 items-end">
+          <div class="col-span-2">
+            <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">First Number</label>
+            <select id="swapNum1Select" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs py-2 px-2.5 text-white font-mono focus:outline-none focus:border-blue-500">
+              <option value="0">0 (Blank)</option>
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+
+          <div class="col-span-1 flex items-center justify-center pb-0.5">
+            <button id="btnExecuteSwap" type="button" title="Swap these two numbers" class="w-full h-8 flex items-center justify-center rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+            </button>
+          </div>
+
+          <div class="col-span-2">
+            <label class="text-[10px] text-slate-400 uppercase font-bold block mb-1">Second Number</label>
+            <select id="swapNum2Select" class="w-full bg-slate-900 border border-slate-700 rounded-lg text-xs py-2 px-2.5 text-white font-mono focus:outline-none focus:border-blue-500">
+              <option value="0">0 (Blank)</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8" selected>8</option>
+            </select>
+          </div>
         </div>
-        <span class="text-[10px] text-slate-400 font-semibold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 shrink-0 uppercase tracking-wider">Tile Swap</span>
+        <p class="text-[11px] text-slate-400">
+          Tip: You can also click any two tiles directly on the preview grid below to swap them.
+        </p>
       </div>
 
-      <!-- Dual Interactive Boards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        
-        <!-- Initial State Board -->
-        <div class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-          <div class="w-full flex items-center justify-between text-xs">
-            <span class="font-bold text-white flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-violet-400"></span> Initial State
-            </span>
-            <span id="customInitInversions" class="font-mono text-[11px] text-violet-400 font-semibold">Inversions: 11</span>
-          </div>
-
-          <!-- 3x3 Grid -->
-          <div id="modalInitGrid" class="custom-slider-grid"></div>
-
-          <!-- Quick Actions -->
-          <div class="w-full flex flex-wrap gap-1.5 pt-1 justify-center text-[11px]">
-            <button id="btnShuffleInit" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition font-medium flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-              <span>Random Shuffle</span>
-            </button>
-            <button id="btnLoadAssignmentInit" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition font-medium">
-              Assignment Preset
-            </button>
-            <button id="btnResetInitModal" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg border border-slate-700 transition font-medium">
-              Reset
-            </button>
-          </div>
+      <!-- Board Preview -->
+      <div class="flex flex-col items-center space-y-2">
+        <div id="modalInitGrid" class="custom-slider-grid"></div>
+        <div class="flex items-center justify-between w-full text-xs px-2 text-slate-400">
+          <span>Initial State Layout</span>
+          <span id="customInitInversions" class="font-mono text-[11px] text-violet-400 font-semibold">Inversions: 11</span>
         </div>
-
-        <!-- Goal State Board -->
-        <div class="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-          <div class="w-full flex items-center justify-between text-xs">
-            <span class="font-bold text-white flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Goal State
-            </span>
-            <span id="customGoalInversions" class="font-mono text-[11px] text-emerald-400 font-semibold">Inversions: 7</span>
-          </div>
-
-          <!-- 3x3 Grid -->
-          <div id="modalGoalGrid" class="custom-slider-grid"></div>
-
-          <!-- Quick Actions -->
-          <div class="w-full flex flex-wrap gap-1.5 pt-1 justify-center text-[11px]">
-            <button id="btnLoadAssignmentGoal" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition font-medium">
-              Assignment Goal
-            </button>
-            <button id="btnLoadClassicGoal" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition font-medium">
-              Standard (1–8, _)
-            </button>
-            <button id="btnResetGoalModal" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 rounded-lg border border-slate-700 transition font-medium">
-              Reset
-            </button>
-          </div>
-        </div>
-
       </div>
 
-      <!-- Live Solvability Parity Indicator in Modal -->
-      <div id="modalSolvabilityNotice" class="p-3 rounded-xl border flex items-center justify-between text-xs bg-emerald-500/10 border-emerald-500/20 text-emerald-300">
+      <!-- Solvability Notice -->
+      <div id="modalSolvabilityNotice" class="p-2.5 rounded-xl border flex items-center justify-between text-xs bg-emerald-500/10 border-emerald-500/20 text-emerald-300">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="modalSolvabilityText" class="font-semibold">States are Solvable: Inversion parities match.</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="modalSolvabilityText" class="font-semibold text-[11px]">States are Solvable</span>
         </div>
         <span class="text-[10px] text-slate-400 font-mono">Permutation Valid</span>
       </div>
@@ -862,7 +782,7 @@
         </button>
         <button id="btnSaveCustomBoard" type="button" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition shadow-lg shadow-blue-600/25 flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>Apply Board Configuration</span>
+          <span>Change Board</span>
         </button>
       </div>
     </div>

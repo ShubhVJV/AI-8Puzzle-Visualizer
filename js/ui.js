@@ -441,37 +441,35 @@ function initApp() {
     btnReplay.classList.add('hidden');
   }
 
-  // ==================== INTERACTIVE CUSTOM BLOCK SWAPPER CONTROLLER ====================
+  // ==================== METHOD 1: SWAP TWO NUMBERS CONTROLLER ====================
   let modalInitBoard = [...initialBoard];
-  let modalGoalBoard = [...goalBoard];
   let selectedSwapInit = null;
-  let selectedSwapGoal = null;
 
   const modalInitGrid = document.getElementById('modalInitGrid');
-  const modalGoalGrid = document.getElementById('modalGoalGrid');
+  const swapNum1Select = document.getElementById('swapNum1Select');
+  const swapNum2Select = document.getElementById('swapNum2Select');
+  const btnExecuteSwap = document.getElementById('btnExecuteSwap');
   const customInitInversions = document.getElementById('customInitInversions');
-  const customGoalInversions = document.getElementById('customGoalInversions');
   const modalSolvabilityNotice = document.getElementById('modalSolvabilityNotice');
   const modalSolvabilityText = document.getElementById('modalSolvabilityText');
   const btnCancelCustomModal = document.getElementById('btnCancelCustomModal');
 
-  function renderModalBoard(container, board, isInit = true) {
-    if (!container) return;
-    container.innerHTML = '';
-    const selectedIdx = isInit ? selectedSwapInit : selectedSwapGoal;
+  function renderModalBoard() {
+    if (!modalInitGrid) return;
+    modalInitGrid.innerHTML = '';
 
-    board.forEach((val, idx) => {
+    modalInitBoard.forEach((val, idx) => {
       const tile = document.createElement('div');
       const isBlank = (val === 0);
-      const isSelected = (idx === selectedIdx);
+      const isSelected = (idx === selectedSwapInit);
 
       let cls = 'custom-slider-tile ';
       if (isBlank) {
         cls += 'tile-blank';
-        tile.title = isSelected ? 'Selected (Click another block to swap)' : 'Empty slot (Click to swap)';
+        tile.title = isSelected ? 'Selected' : 'Click to select and swap';
       } else {
         cls += 'tile-active';
-        tile.title = isSelected ? 'Selected (Click another block to swap)' : 'Click to select and swap';
+        tile.title = isSelected ? 'Selected' : 'Click to select and swap';
       }
       if (isSelected) {
         cls += ' tile-selected';
@@ -483,127 +481,93 @@ function initApp() {
       tile.dataset.value = val;
 
       tile.addEventListener('click', () => {
-        handleModalTileSwapClick(isInit, idx);
+        handleModalTileSwapClick(idx);
       });
 
-      container.appendChild(tile);
+      modalInitGrid.appendChild(tile);
     });
 
     updateModalStatus();
   }
 
-  function handleModalTileSwapClick(isInit, idx) {
-    const board = isInit ? modalInitBoard : modalGoalBoard;
-    const selected = isInit ? selectedSwapInit : selectedSwapGoal;
-
-    if (selected === null) {
+  function handleModalTileSwapClick(idx) {
+    if (selectedSwapInit === null) {
       // First click: select this tile
-      if (isInit) selectedSwapInit = idx;
-      else selectedSwapGoal = idx;
-      renderModalBoards();
-    } else if (selected === idx) {
+      selectedSwapInit = idx;
+      if (swapNum1Select) {
+        swapNum1Select.value = String(modalInitBoard[idx]);
+      }
+      renderModalBoard();
+    } else if (selectedSwapInit === idx) {
       // Clicked same tile again: deselect
-      if (isInit) selectedSwapInit = null;
-      else selectedSwapGoal = null;
-      renderModalBoards();
+      selectedSwapInit = null;
+      renderModalBoard();
     } else {
-      // Second click: swap selected tile and clicked tile!
-      const temp = board[selected];
-      board[selected] = board[idx];
-      board[idx] = temp;
-      if (isInit) selectedSwapInit = null;
-      else selectedSwapGoal = null;
-      renderModalBoards();
-    }
-  }
+      // Second click: swap selected tile and clicked tile
+      const temp = modalInitBoard[selectedSwapInit];
+      modalInitBoard[selectedSwapInit] = modalInitBoard[idx];
+      modalInitBoard[idx] = temp;
 
-  function renderModalBoards() {
-    renderModalBoard(modalInitGrid, modalInitBoard, true);
-    renderModalBoard(modalGoalGrid, modalGoalBoard, false);
+      if (swapNum1Select && swapNum2Select) {
+        swapNum1Select.value = String(modalInitBoard[selectedSwapInit]);
+        swapNum2Select.value = String(modalInitBoard[idx]);
+      }
+
+      selectedSwapInit = null;
+      renderModalBoard();
+    }
   }
 
   function updateModalStatus() {
     const invInit = PuzzleUtils.countInversions(modalInitBoard);
-    const invGoal = PuzzleUtils.countInversions(modalGoalBoard);
+    const invGoal = PuzzleUtils.countInversions(goalBoard);
 
     if (customInitInversions) customInitInversions.textContent = `Inversions: ${invInit}`;
-    if (customGoalInversions) customGoalInversions.textContent = `Inversions: ${invGoal}`;
 
     const isSolv = (invInit % 2 === invGoal % 2);
     if (modalSolvabilityNotice && modalSolvabilityText) {
       if (isSolv) {
-        modalSolvabilityNotice.className = 'p-3 rounded-xl border flex items-center justify-between text-xs bg-emerald-500/10 border-emerald-500/20 text-emerald-300';
-        modalSolvabilityText.innerHTML = `Solvable Configuration: Inversion parities match (${invInit % 2 === 0 ? 'Even' : 'Odd'}).`;
+        modalSolvabilityNotice.className = 'p-2.5 rounded-xl border flex items-center justify-between text-xs bg-emerald-500/10 border-emerald-500/20 text-emerald-300';
+        modalSolvabilityText.innerHTML = `Solvable State (Parity: ${invInit % 2 === 0 ? 'Even' : 'Odd'})`;
       } else {
-        modalSolvabilityNotice.className = 'p-3 rounded-xl border flex items-center justify-between text-xs bg-rose-500/10 border-rose-500/30 text-rose-300';
-        modalSolvabilityText.innerHTML = `Parity Mismatch (${invInit} vs ${invGoal}). Swap any two numbered blocks to make solvable.`;
+        modalSolvabilityNotice.className = 'p-2.5 rounded-xl border flex items-center justify-between text-xs bg-rose-500/10 border-rose-500/30 text-rose-300';
+        modalSolvabilityText.innerHTML = `Unsolvable Pair (Parity mismatch: ${invInit} vs ${invGoal})`;
       }
     }
   }
 
-  // Shuffle button for Initial board
-  const btnShuffleInit = document.getElementById('btnShuffleInit');
-  if (btnShuffleInit) {
-    btnShuffleInit.addEventListener('click', () => {
-      modalInitBoard = PuzzleUtils.generateRandomSolvable(modalGoalBoard, 12);
-      selectedSwapInit = null;
-      renderModalBoards();
-    });
-  }
+  // Swap Numbers Button Click
+  if (btnExecuteSwap) {
+    btnExecuteSwap.addEventListener('click', () => {
+      const val1 = parseInt(swapNum1Select.value, 10);
+      const val2 = parseInt(swapNum2Select.value, 10);
 
-  // Presets in modal
-  const btnLoadAssignmentInit = document.getElementById('btnLoadAssignmentInit');
-  if (btnLoadAssignmentInit) {
-    btnLoadAssignmentInit.addEventListener('click', () => {
-      modalInitBoard = [2, 8, 3, 1, 6, 4, 7, 0, 5];
-      selectedSwapInit = null;
-      renderModalBoards();
-    });
-  }
+      if (val1 === val2) {
+        alert('Please select two different numbers to swap.');
+        return;
+      }
 
-  const btnResetInitModal = document.getElementById('btnResetInitModal');
-  if (btnResetInitModal) {
-    btnResetInitModal.addEventListener('click', () => {
-      modalInitBoard = [...initialBoard];
-      selectedSwapInit = null;
-      renderModalBoards();
-    });
-  }
+      const idx1 = modalInitBoard.indexOf(val1);
+      const idx2 = modalInitBoard.indexOf(val2);
 
-  const btnLoadAssignmentGoal = document.getElementById('btnLoadAssignmentGoal');
-  if (btnLoadAssignmentGoal) {
-    btnLoadAssignmentGoal.addEventListener('click', () => {
-      modalGoalBoard = [1, 2, 3, 8, 0, 4, 7, 6, 5];
-      selectedSwapGoal = null;
-      renderModalBoards();
-    });
-  }
-
-  const btnLoadClassicGoal = document.getElementById('btnLoadClassicGoal');
-  if (btnLoadClassicGoal) {
-    btnLoadClassicGoal.addEventListener('click', () => {
-      modalGoalBoard = [1, 2, 3, 4, 5, 6, 7, 8, 0];
-      selectedSwapGoal = null;
-      renderModalBoards();
-    });
-  }
-
-  const btnResetGoalModal = document.getElementById('btnResetGoalModal');
-  if (btnResetGoalModal) {
-    btnResetGoalModal.addEventListener('click', () => {
-      modalGoalBoard = [...goalBoard];
-      selectedSwapGoal = null;
-      renderModalBoards();
+      if (idx1 !== -1 && idx2 !== -1) {
+        modalInitBoard[idx1] = val2;
+        modalInitBoard[idx2] = val1;
+        selectedSwapInit = null;
+        renderModalBoard();
+      }
     });
   }
 
   // Modal Open & Close
   btnOpenCustomModal.addEventListener('click', () => {
     modalInitBoard = [...initialBoard];
-    modalGoalBoard = [...goalBoard];
     selectedSwapInit = null;
-    selectedSwapGoal = null;
-    renderModalBoards();
+    if (swapNum1Select && swapNum2Select) {
+      swapNum1Select.value = String(modalInitBoard[0]);
+      swapNum2Select.value = String(modalInitBoard[1]);
+    }
+    renderModalBoard();
     customModal.classList.remove('hidden');
   });
 
@@ -620,13 +584,12 @@ function initApp() {
   }
 
   btnSaveCustomBoard.addEventListener('click', () => {
-    if (!PuzzleUtils.isValidBoard(modalInitBoard) || !PuzzleUtils.isValidBoard(modalGoalBoard)) {
-      alert('Invalid configuration! Each board must contain numbers 0 through 8 exactly once (0 represents the blank slot).');
+    if (!PuzzleUtils.isValidBoard(modalInitBoard)) {
+      alert('Invalid configuration! Board must contain numbers 0 through 8 exactly once.');
       return;
     }
 
     initialBoard = [...modalInitBoard];
-    goalBoard = [...modalGoalBoard];
     customModal.classList.add('hidden');
 
     visualizer.setBoards(initialBoard, goalBoard);
