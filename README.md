@@ -6,7 +6,7 @@
 > **Student Name:** Shubh Vijayvargiya  
 > **Registration Number:** 24BCT0046  
 > **Assigned Algorithm:** Algorithm #2 — Depth First Search (DFS)  
-> **GitHub Pages Live Demo:** [https://shubhvijayvargiya.github.io/AI-8Puzzle-Visualizer/](https://github.com/ShubhVJV/ai-8-puzzle-visualizer) 
+> **GitHub Pages Live Demo:** [https://shubhvijayvargiya.github.io/AI-8Puzzle-Visualizer/](https://github.com/ShubhVJV/ai-8-puzzle-visualizer)                     
 > **GitHub Repository:** [https://github.com/shubhvijayvargiya/AI-8Puzzle-Visualizer](https://ai-8-puzzle-visualizer-2.vercel.app/)
 
 ---
