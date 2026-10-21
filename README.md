@@ -163,14 +163,7 @@ Open the deployed GitHub Pages URL directly in any modern browser:
 
 ---
 
-## 🎥 3–5 Minute Video Demonstration Outline
 
-- **0:00 – 0:45:** Introduction — Shubh Vijayvargiya (24BCT0046), Artificial Intelligence Case Study on 8-Puzzle, Assigned: Depth First Search.
-- **0:45 – 1:45:** Problem Formulation — 3×3 grid, Inversion Parity Solvability proof, Method 1 custom input & Method 2 random puzzle generation.
-- **1:45 – 3:00:** Depth First Search Visualizer — Execution trace, LIFO Stack visualization, step controls (Run, Pause, Next Step, Speed slider), and explanation of DFS depth traversal.
-- **3:00 – 4:15:** 6-Algorithm Comparison — Benchmarking table, space vs. time trade-offs, heuristic performance, and concluding remarks.
-
----
 
 ## 📚 References
 
